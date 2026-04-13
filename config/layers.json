@@ -1,0 +1,38 @@
+{
+  "map": {
+    "center_lat": 40.1,
+    "center_lon": -95.3,
+    "zoom": 12,
+    "title": "GIS Dashboard"
+  },
+  "layers": [
+    {
+      "id": "hcfcd_watershed",
+      "name": "HCFCD Watershed",
+      "type": "geojson",
+      "source": "data/HCFCD_Watersheds.geojson",
+      "style": {
+        "color": "blue",
+        "weight": 2,
+        "opacity": 0.7,
+        "fillColor": "lightblue",
+        "fillOpacity": 0.5
+      },
+      "visible": true,
+      "downloadable": true
+    },
+    {
+      "id": "wob_watershed",
+      "name": "White Oak Bayou Watershed",
+      "type": "geojson",
+      "source": "data/WOB_watershed.geojson",
+      "style": {
+        "color": "gray",
+        "weight": 3,
+        "opacity": 0.8
+      },
+      "visible": true,
+      "downloadable": true
+    }
+  ]
+}
