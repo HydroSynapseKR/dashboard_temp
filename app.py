@@ -2,7 +2,6 @@ import streamlit as st
 import folium
 from streamlit_folium import st_folium
 import geopandas as gpd
-import json
 from utils.layer_manager import LayerManager
 
 # Page configuration
@@ -20,6 +19,29 @@ map_config = layer_manager.get_map_config()
 
 # Create columns for layout
 col1, col2 = st.columns([3, 1])
+
+def create_label_html(label_text, label_config):
+    """Create styled label HTML"""
+    font_size = label_config.get("size", 12)
+    font_weight = label_config.get("weight", "normal")
+    text_color = label_config.get("color", "black")
+    use_outline = label_config.get("useOutline", True)
+    
+    if use_outline:
+        text_shadow = "-1px -1px 1px #fff, 1px -1px 1px #fff, -1px 1px 1px #fff, 1px 1px 1px #fff"
+    else:
+        text_shadow = "none"
+    
+    return f'''
+        <div style="
+            font-size: {font_size}px; 
+            font-weight: {font_weight}; 
+            color: {text_color};
+            text-shadow: {text_shadow};
+        ">
+            {label_text}
+        </div>
+    '''
 
 # ============================================================
 # MAIN MAP (Left Column)
@@ -49,6 +71,12 @@ with col1:
                 st.session_state.layer_data[layer['id']] = gdf                
                 
                 style = layer.get('style', {})
+                symbolize_field = layer.get('symbolizefield', None)
+                if symbolize_field and symbolize_field in gdf.columns:
+                    unique_values = gdf[symbolize_field].unique()
+                    color_palette = ['red', 'blue', 'green', 'orange', 'purple', 'cyan', 'magenta']
+                    color_map = {val: color_palette[i % len(color_palette)] for i, val in enumerate(unique_values)}
+                    style['fillColor'] = gdf[symbolize_field].map(color_map)
                 
                 # Create feature group
                 fg = folium.FeatureGroup(name=layer['name'])
@@ -56,6 +84,10 @@ with col1:
                 # Add geometries based on type
                 for idx, row in gdf.iterrows():
                     geom = row.geometry
+                    if symbolize_field and symbolize_field in gdf.columns:
+                        fillcolor = style['fillColor'].get(idx, 'blue')
+                    else:
+                        fillcolor = style.get('fillColor', 'blue')
                     
                     if geom.geom_type == 'Polygon':
                         folium.Polygon(
@@ -63,9 +95,9 @@ with col1:
                             color=style.get('color', 'blue'),
                             weight=style.get('weight', 2),
                             opacity=style.get('opacity', 0.7),
-                            fillColor=style.get('fillColor', 'lightblue'),
+                            fillColor=fillcolor,
                             fillOpacity=style.get('fillOpacity', 0.5),
-                            popup=f"{layer['name']} - {row.get('name', idx)}"
+                            popup=f"{layer['name']} - {row.get(symbolize_field, idx)}"
                         ).add_to(fg)
                     
                     elif geom.geom_type == 'LineString':
@@ -87,7 +119,14 @@ with col1:
                             opacity=style.get('opacity', 0.7),
                             popup=f"{layer['name']} - {row.get('name', idx)}"
                         ).add_to(fg)
-                
+                    
+                    if layer.get('labelfield', None):
+                        centroid = geom.centroid
+                        folium.Marker(
+                            location=(centroid.y, centroid.x),
+                            icon=folium.DivIcon(create_label_html(str(row[layer['labelfield']]), layer.get('labelstyle', {})))
+                        ).add_to(fg)
+
                 fg.add_to(m)
         
         except Exception as e:

@@ -1,8 +1,8 @@
 {
   "map": {
-    "center_lat": 40.1,
-    "center_lon": -95.3,
-    "zoom": 12,
+    "center_lat": 29.861,
+    "center_lon": -95.4,
+    "zoom": 11,
     "title": "GIS Dashboard"
   },
   "layers": [
@@ -12,14 +12,20 @@
       "type": "geojson",
       "source": "data/HCFCD_Watersheds.geojson",
       "style": {
-        "color": "blue",
+        "color": "lightgray",
         "weight": 2,
-        "opacity": 0.7,
+        "opacity": 0,
         "fillColor": "lightblue",
-        "fillOpacity": 0.5
+        "fillOpacity": 0
       },
       "visible": true,
-      "downloadable": true
+      "downloadable": true,
+      "labelfield": "WTSHNAME",
+      "labelstyle": {
+        "size": "12",
+        "weight": "bold",
+        "color": "magenta"
+      }
     },
     {
       "id": "wob_watershed",
@@ -27,9 +33,27 @@
       "type": "geojson",
       "source": "data/WOB_watershed.geojson",
       "style": {
-        "color": "gray",
-        "weight": 3,
-        "opacity": 0.8
+        "color": "black",
+        "weight": 2,
+        "opacity": 1,
+        "fillColor": "gray",
+        "fillOpacity": 0
+      },
+      "visible": true,
+      "downloadable": true
+    },
+    {
+      "id": "Workshare",
+      "name": "workshare",
+      "type": "geojson",
+      "source": "data/Workshare.geojson",
+      "symbolizefield": "SOURCE_CIT",
+      "style": {
+        "color": "blue",
+        "weight": 0,
+        "opacity": 0,
+        "fillColor": "red",
+        "fillOpacity": 0.5
       },
       "visible": true,
       "downloadable": true
